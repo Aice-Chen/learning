@@ -49,6 +49,7 @@ def _build_auth(settings: Settings):
         client_secret=settings.github_client_secret,
         base_url=settings.base_url,
         jwt_signing_key=settings.jwt_signing_key,
+        required_scopes=["read:user"],
     )
     allowed = settings.allowed_github_user.lower()
 

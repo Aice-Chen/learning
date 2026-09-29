@@ -41,6 +41,8 @@
 
 设置了 LEARNING_GITHUB_CLIENT_ID 时启用 GitHub 登录（FastMCP 的 GitHubProvider，即 OAuth 代理，负责动态客户端注册）。每个工具都附带一个检查：令牌中的 GitHub 用户名必须等于 LEARNING_ALLOWED_GITHUB_USER（不区分大小写）。未启用认证时，HTTP 服务只允许监听本机地址。
 
+GitHub OAuth 只申请 `read:user`，用于读取登录身份。仓库的拉取与推送继续使用仓库部署密钥。
+
 ## 配置（环境变量）
 
 | 变量 | 说明 | 默认值 |
