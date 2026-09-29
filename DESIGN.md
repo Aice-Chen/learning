@@ -95,3 +95,4 @@
   - 本地 agent 的状态经工具读写，材料和作业代码直接读本地文件。
   - read_source 返回 PDF 原件，客户端看不到时由模型告知学习者更换客户端，不提供文字提取的退路。大文件先靠拆分控制粒度，再靠 PDF 书签定位页码。
   - start_session 提供 include_guide 参数：已加载 AGENTS.md 的本地 agent 可以不重复获取。
+  - 首次 VPS 部署准备时加入 server/uv.lock，固定已通过测试的依赖版本；部署使用 uv sync --locked，使本地与服务器按同一份依赖锁安装。
