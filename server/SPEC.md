@@ -58,4 +58,4 @@
 
 ## 测试
 
-`cd server && uv run --extra test python -m pytest -q`。测试在临时仓库上走一遍全部工具，包括 git 提交与推送、PDF 截取、整合标记校验和下载，不包含认证。
+`cd server && uv run --locked --extra test python -m pytest -q`。测试在临时仓库上走一遍全部工具，包括 git 提交与推送、PDF 截取、整合标记校验和下载，不包含认证。

@@ -2,6 +2,9 @@
 sources/*
 !sources/.gitkeep
 
+# 个人笔记保留在本地，不进入学习系统仓库
+/notes/
+
 # 服务端
 server/.venv/
 __pycache__/

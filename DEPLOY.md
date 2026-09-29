@@ -72,11 +72,13 @@ git clone git@github.com:<你>/learning.git ~/learning
 curl -LsSf https://astral.sh/uv/install.sh | sh
 source ~/.local/bin/env
 cd ~/learning/server
-uv sync --extra test
-uv run --extra test python -m pytest -q
+uv sync --locked --extra test
+uv run --locked --extra test python -m pytest -q
 ```
 
-测试全部通过，说明工具逻辑、git 提交与推送、PDF 截取在这台服务器上都正常。
+`server/uv.lock` 记录经过测试的依赖版本。`--locked` 要求依赖配置与锁文件一致，发现不一致时会停止，避免部署时自动改写锁文件。
+
+这些测试使用临时仓库，覆盖工具逻辑、git 提交与推送、PDF 截取等行为。GitHub OAuth 和实际客户端接入按后面的步骤验证。
 
 ## 6. 创建 GitHub OAuth App
 
@@ -131,11 +133,16 @@ Wants=network-online.target
 
 [Service]
 User=learning
+Group=learning
 WorkingDirectory=/home/learning/learning/server
 EnvironmentFile=/home/learning/learning.env
-ExecStart=/home/learning/.local/bin/uv run learning-mcp
+ExecStart=/home/learning/learning/server/.venv/bin/learning-mcp
 Restart=on-failure
 RestartSec=5
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
 
 [Install]
 WantedBy=multi-user.target
@@ -144,6 +151,8 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now learning-mcp
 sudo systemctl status learning-mcp
 ```
+
+服务直接使用第 5 步安装好的虚拟环境，启动时不安装或更新依赖。更新依赖后，按第 14 步安装、测试并重启。
 
 ## 9. Caddy 提供 HTTPS
 
@@ -227,13 +236,22 @@ ssh -L 18384:127.0.0.1:8384 <你的 SSH 用户>@<VPS IP>
 
 ## 14. 日常维护
 
-- 服务端代码修改后：本地 commit 并 push，再在服务器上执行
+- 修改依赖配置时，先在本地的 `server/` 下运行 `uv lock`，再运行 `uv run --locked --extra test python -m pytest -q`；把依赖配置和更新后的锁文件一起提交。
+- 服务端代码或依赖修改并推送后，在服务器上依次拉取、安装锁定依赖、测试、重启并检查服务状态。前一步失败时，下面的命令会停止，不会继续重启：
 
   ```bash
-  sudo -iu learning git -C /home/learning/learning pull
-  sudo systemctl restart learning-mcp
+  sudo -iu learning bash -c '
+  set -e
+  cd /home/learning/learning
+  git pull --ff-only
+  cd server
+  /home/learning/.local/bin/uv sync --locked --extra test
+  /home/learning/.local/bin/uv run --locked --extra test python -m pytest -q
+  ' &&
+  sudo systemctl restart learning-mcp &&
+  sudo systemctl --no-pager status learning-mcp
   ```
 
-  依赖有变化时，在 `server/` 下再运行一次 `uv sync`。
+  重启后，再执行第 9 步的 HTTPS 和 OAuth 元数据检查，确认对外入口正常。
 - 查看日志：`sudo journalctl -u learning-mcp -f`。
 - 备份：状态和规则在 GitHub 上有完整历史；材料在笔记本和服务器上各有一份，并开启了版本控制。
