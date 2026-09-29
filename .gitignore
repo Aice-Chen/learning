@@ -1,0 +1,13 @@
+# 学习材料不进 git，由 Syncthing 同步
+sources/*
+!sources/.gitkeep
+
+# 服务端
+server/.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.env
+
+.DS_Store
+Thumbs.db

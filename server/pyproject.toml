@@ -1,0 +1,23 @@
+[project]
+name = "learning-mcp"
+version = "0.1.0"
+description = "个人学习系统的 MCP 服务端"
+requires-python = ">=3.11"
+dependencies = [
+    "fastmcp>=4.0,<5",
+    "pypdf>=6",
+    "httpx>=0.27",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[project.scripts]
+learning-mcp = "learning_mcp.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["learning_mcp"]
